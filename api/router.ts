@@ -1,6 +1,7 @@
 import Router from "@koa/router";
 import { Context } from "koa";
 import { createMainNotionPage } from "./callbacks/createMainPage";
+import { getActiveCourses } from "./fetch/getActiveCourses";
 
 import { getCourseAssignments } from "./fetch/getCourseAssignments";
 
@@ -10,6 +11,49 @@ const router = new Router({
 
 router.post("/createPage", async (ctx: Context) => {
   await createMainNotionPage(ctx);
+});
+
+/*
+  TESTING ENDPOINT DO NOT USE
+*/
+router.get("/format", async (ctx: Context) => {
+  const courses = await getActiveCourses();
+  console.log(
+    ...courses.map((course: any) => {
+      return {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            {
+              type: "text",
+              text: {
+                content: course.name,
+                link: null,
+              },
+            },
+          ],
+        },
+        color: "default",
+        children: [
+          {
+            object: "block",
+            type: "paragraph",
+            paragraph: {
+              rich_text: [
+                {
+                  type: "text",
+                  text: {
+                    content: "Paragraph",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      };
+    })
+  );
 });
 
 router.post("/getCourseAssignments", async (ctx: Context) => {
