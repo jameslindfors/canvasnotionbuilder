@@ -1,13 +1,10 @@
 import Koa from "koa";
-import Router from "@koa/router";
-
+import router from "./api/router";
+import { env } from "./utils/env";
 const app = new Koa();
-const router = new Router();
-
-router.get("/", async (ctx) => {
-  ctx.body = "Hello World";
-});
 
 app.use(router.routes());
 app.use(router.allowedMethods());
-app.listen(3000);
+app.listen(env.PORT, () =>
+  console.log(`Server is listening on port ${env.PORT}`)
+);
