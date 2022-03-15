@@ -6,4 +6,5 @@ export const env = load({
   CANVAS_API_DOMAIN: String,
   NOTION_API_TOKEN: String,
   NOTION_DATABASE_ID: String,
+  NOTION_PAGE_ID: String,
 });

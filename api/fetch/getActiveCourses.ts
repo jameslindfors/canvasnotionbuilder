@@ -21,7 +21,7 @@ query {
 `;
 
 export const getActiveCourses = async () => {
-  axios({
+  return axios({
     url: env.CANVAS_API_DOMAIN,
     method: "post",
     data: {
