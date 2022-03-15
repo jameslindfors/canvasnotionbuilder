@@ -3,14 +3,18 @@ import { Client } from "@notionhq/client";
 import { getActiveCourses } from "../fetch/getActiveCourses";
 import { env } from "../../utils/env";
 
+// Types
+import { Context } from "koa";
+import { UpdatePageResponse } from "@notionhq/client/build/src/api-endpoints";
+
 const notion = new Client({ auth: env.NOTION_API_TOKEN });
 
-export const createMainNotionPage = async () => {
+export const createMainNotionPage = async (ctx: Context) => {
   const courses: ActiveCourses = await getActiveCourses();
   // @ts-ignore
   const currTerm = courses[0].term.name;
 
-  const notionPage = await notion.pages
+  const defaultNotionPage = await notion.pages
     .update({
       page_id: env.NOTION_PAGE_ID,
       properties: {
@@ -35,10 +39,7 @@ export const createMainNotionPage = async () => {
         },
       },
     })
-    .then(async (page) => {
-      const block = await notion.blocks.children.list({
-        block_id: page.id,
-      });
+    .then(async (page: UpdatePageResponse) => {
       await notion.blocks.children.append({
         block_id: page.id,
         children: [
@@ -88,7 +89,9 @@ export const createMainNotionPage = async () => {
           },
         ],
       });
-
+      return page;
+    })
+    .then(async (page: UpdatePageResponse) => {
       await notion.databases.create({
         parent: { page_id: page.id, type: "page_id" },
         title: [
@@ -111,10 +114,26 @@ export const createMainNotionPage = async () => {
           Description: {
             rich_text: {},
           },
+          "Course Code": {
+            rich_text: {},
+          },
+          "Start Date": {
+            type: "date",
+            date: {},
+          },
+          "End Date": {
+            type: "date",
+            date: {},
+          },
         },
       });
     })
     .finally(() => {
+      ctx.status = 200;
       console.log("Done");
+    })
+    .catch((err) => {
+      ctx.status = 500;
+      console.log(err);
     });
 };
