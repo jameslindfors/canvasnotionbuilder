@@ -5,7 +5,7 @@ import { env } from "./utils/env";
 import { connectDB } from "./utils/connectDB";
 const app = new Koa();
 
-connectDB(10);
+// connectDB(10);
 app.use(router.routes());
 app.use(router.allowedMethods());
 app.listen(env.PORT, () =>

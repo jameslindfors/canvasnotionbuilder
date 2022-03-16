@@ -1,6 +1,6 @@
 import Router from "@koa/router";
 import { Context } from "koa";
-import { createMainNotionPage } from "./callbacks/createMainPage";
+import { createDefaultNotionPage } from "./callbacks/createDefaultNotionPage";
 import { getActiveCourses } from "./fetch/getActiveCourses";
 
 import { getCourseAssignments } from "./fetch/getCourseAssignments";
@@ -9,8 +9,9 @@ const router = new Router({
   prefix: "/api/v1",
 });
 
-router.post("/createPage", async (ctx: Context) => {
-  await createMainNotionPage(ctx);
+router.post("/createPage/:uid/:pid/:bid", async (ctx: Context) => {
+  const { uid, pid, bid } = ctx.params;
+  await createDefaultNotionPage(ctx);
 });
 
 router.post("/getCourseAssignments", async (ctx: Context) => {
