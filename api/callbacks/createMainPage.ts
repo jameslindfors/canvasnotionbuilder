@@ -23,6 +23,7 @@ export const createMainNotionPage = async (ctx: Context) => {
     .then(async (page: UpdatePageResponse) => {
       const block: AppendBlockChildrenResponse =
         await propagateDefaultNotionInfoBlocks(page.id);
+      await generateDefaultCourseNotionDatabase(page.id, courses);
       const lastBlockId =
         block.results.length > 0
           ? block.results[block.results.length - 1].id
