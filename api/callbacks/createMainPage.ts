@@ -27,7 +27,6 @@ export const createMainNotionPage = async (ctx: Context) => {
         block.results.length > 0
           ? block.results[block.results.length - 1].id
           : page.id;
-      ctx.body = block.results;
       await propagateDefaultNotionTableBlock(lastBlockId, courses);
     })
     .catch((err) => {

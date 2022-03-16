@@ -87,6 +87,23 @@ export const propagateDefaultNotionTableBlock = async (
   blockId: string,
   courses: ActiveCourses
 ) => {
+  const courseFormatted = courses.map((course: any) => {
+    return {
+      object: "block",
+      type: "bulleted_list_item",
+      bulleted_list_item: {
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: course.name,
+              link: null,
+            },
+          },
+        ],
+      },
+    };
+  });
   return await notion.blocks.children.append({
     block_id: blockId,
     children: [
@@ -95,42 +112,8 @@ export const propagateDefaultNotionTableBlock = async (
         type: "divider",
         divider: {},
       },
-      // ! EXPERIMENTAL
       // @ts-ignore
-      ...courses.map((course: any) => {
-        return {
-          object: "block",
-          type: "bulleted_list_item",
-          bulleted_list_item: {
-            rich_text: [
-              {
-                type: "text",
-                text: {
-                  content: course.name,
-                  link: null,
-                },
-              },
-            ],
-          },
-          color: "default",
-          children: [
-            {
-              object: "block",
-              type: "paragraph",
-              paragraph: {
-                rich_text: [
-                  {
-                    type: "text",
-                    text: {
-                      content: "Paragraph",
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        };
-      }),
+      ...courseFormatted,
     ],
   });
 };
