@@ -1,8 +1,38 @@
-import type { ActiveCourses } from "../../types/activeCoursesTypes";
+import type {
+  ActiveCourses,
+  ActiveCourse,
+} from "../../types/activeCoursesTypes";
+import type { CourseGrades, Grades } from "../../types/courseGradesType";
 import { Client } from "@notionhq/client";
 import { env } from "../../utils/env";
 
+import { getCourseGrades } from "../fetch/getCourseGrades";
+
 const notion = new Client({ auth: env.NOTION_API_TOKEN });
+
+/*
+ * Function to retrieve the grades for all of the active
+ * courses.
+ * @param {ActiveCourses} courses - Object containing all of * the active courses.
+ * @returns [{CourseGrades}] - Array of objects containing
+ * the grades for each course.
+ * Issue: Call takes 13 seconds to complete... way too long.
+ */
+const courseGradeObject = async (courses: ActiveCourses) => {
+  const courseGrades: CourseGrades[] = [];
+  for (const course of courses) {
+    const grades = await getCourseGrades(course.id);
+    courseGrades.push({
+      id: course.id,
+      name: course.name,
+      grades: {
+        currentGrade: grades[0].currentGrade,
+        currentScore: grades[0].currentScore,
+      },
+    });
+  }
+  return courseGrades;
+};
 
 export const createGradeTableBlock = async (
   blockId: string,
