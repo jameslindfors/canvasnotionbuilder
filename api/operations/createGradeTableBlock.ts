@@ -1,7 +1,4 @@
-import type {
-  ActiveCourses,
-  ActiveCourse,
-} from "../../types/activeCoursesTypes";
+import type { ActiveCourses } from "../../types/activeCoursesTypes";
 import type { CourseGrades, Grades } from "../../types/courseGradesType";
 import { Client } from "@notionhq/client";
 import { env } from "../../utils/env";
@@ -25,19 +22,59 @@ const courseGradeObject = async (courses: ActiveCourses) => {
     courseGrades.push({
       id: course.id,
       name: course.name,
-      grades: {
-        currentGrade: grades[0].currentGrade,
-        currentScore: grades[0].currentScore,
-      },
+      grades: grades ? grades[0] : null,
     });
   }
   return courseGrades;
+};
+
+const fillBlockContent = async (courseGrades: CourseGrades[]) => {
+  const blockContent = [];
+  for (const courseGrade of courseGrades) {
+    let color = gradeTextColor(courseGrade);
+    let gradeString = gradeText(courseGrade);
+
+    blockContent.push({
+      object: "block",
+      type: "table_row",
+      table_row: {
+        cells: [
+          [
+            {
+              type: "text",
+              text: {
+                content: courseGrade.name,
+              },
+              annotations: {
+                color: "default",
+              },
+            },
+          ],
+          [
+            {
+              type: "text",
+              text: {
+                content: gradeString,
+              },
+              annotations: {
+                color: color,
+              },
+            },
+          ],
+        ],
+      },
+    });
+  }
+  return blockContent;
 };
 
 export const createGradeTableBlock = async (
   blockId: string,
   courses: ActiveCourses
 ) => {
+  const courseGrades = await courseGradeObject(courses);
+  const blockContent = await fillBlockContent(courseGrades);
+
   return await notion.blocks.children.append({
     block_id: blockId,
     children: [
@@ -63,7 +100,7 @@ export const createGradeTableBlock = async (
                     {
                       type: "text",
                       text: {
-                        content: "Course Name",
+                        content: "Course",
                         link: null,
                       },
                       annotations: {
@@ -96,51 +133,39 @@ export const createGradeTableBlock = async (
                 ],
               },
             },
-            {
-              object: "block",
-              type: "table_row",
-              table_row: {
-                cells: [
-                  [
-                    {
-                      type: "text",
-                      text: {
-                        content: "English",
-                        link: null,
-                      },
-                      annotations: {
-                        bold: false,
-                        italic: false,
-                        strikethrough: false,
-                        underline: false,
-                        code: false,
-                        color: "default",
-                      },
-                    },
-                  ],
-                  [
-                    {
-                      type: "text",
-                      text: {
-                        content: "A (97.3)",
-                        link: null,
-                      },
-                      annotations: {
-                        bold: false,
-                        italic: false,
-                        strikethrough: false,
-                        underline: false,
-                        code: false,
-                        color: "green",
-                      },
-                    },
-                  ],
-                ],
-              },
-            },
+            // @ts-ignore
+            ...blockContent,
           ],
         },
       },
     ],
   });
+};
+
+// Util functions
+
+const gradeTextColor = (courseGrade: any) => {
+  if (courseGrade.grades != null && courseGrade.grades.currentGrade != null) {
+    switch (courseGrade.grades.currentGrade) {
+      case "A":
+        return "green";
+      case "B":
+        return "green";
+      case "C":
+        return "yellow";
+      case "D":
+        return "red";
+      case "F":
+        return "red";
+      default:
+        return "default";
+    }
+  }
+};
+
+const gradeText = (courseGrade: any) => {
+  if (courseGrade.grades != null && courseGrade.grades.currentGrade != null) {
+    return `${courseGrade.grades.currentGrade} - ${courseGrade.grades.currentScore}%`;
+  }
+  return "No Grade";
 };

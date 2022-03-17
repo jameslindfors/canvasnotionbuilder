@@ -12,6 +12,7 @@ import {
   generateDefaultNotionPage,
   createDefaultNotionInfoBlocks,
 } from "../operations/pageSetup";
+import { createGradeTableBlock } from "../operations/createGradeTableBlock";
 
 export const createDefaultNotionPage = async (ctx: Context) => {
   const courses: ActiveCourses = await getActiveCourses();
@@ -26,6 +27,7 @@ export const createDefaultNotionPage = async (ctx: Context) => {
           ? block.results[block.results.length - 1].id
           : page.id;
       // save page id and block id to database
+      await createGradeTableBlock(lastBlockId, courses);
     })
     .catch((err) => {
       // Eventually store this error in a log file

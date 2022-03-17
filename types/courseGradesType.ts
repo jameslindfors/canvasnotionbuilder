@@ -6,7 +6,7 @@ export type CourseGrades = {
         currentGrade: string;
         currentScore: number;
       }
-    | [...any];
+    | [];
 };
 
 export type Grades = {

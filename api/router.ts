@@ -1,7 +1,6 @@
 import Router from "@koa/router";
 import { Context } from "koa";
 import { createDefaultNotionPage } from "./callbacks/createDefaultNotionPage";
-import { getActiveCourses } from "./fetch/getActiveCourses";
 
 import { getCourseAssignments } from "./fetch/getCourseAssignments";
 
@@ -12,18 +11,6 @@ const router = new Router({
 router.post("/createPage/:uid/:pid/:bid", async (ctx: Context) => {
   const { uid, pid, bid } = ctx.params;
   await createDefaultNotionPage(ctx);
-});
-
-router.post("/getCourseAssignments", async (ctx: Context) => {
-  await getCourseAssignments("95646")
-    .then((result) => {
-      ctx.body = result.assignmentsConnection.nodes;
-      ctx.status = 200;
-    })
-    .catch((err) => {
-      console.log(err);
-      ctx.status = 500;
-    });
 });
 
 export default router;
