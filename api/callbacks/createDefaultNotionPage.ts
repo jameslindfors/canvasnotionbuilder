@@ -8,11 +8,13 @@ import {
   UpdatePageResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
+// Operations
 import {
   generateDefaultNotionPage,
   createDefaultNotionInfoBlocks,
 } from "../operations/pageSetup";
 import { createGradeTableBlock } from "../operations/createGradeTableBlock";
+import { createUpcomingAssignmentsTodo } from "../operations/createUpcomingAssignmentsTodo";
 
 export const createDefaultNotionPage = async (ctx: Context) => {
   const courses: ActiveCourses = await getActiveCourses();
@@ -26,11 +28,12 @@ export const createDefaultNotionPage = async (ctx: Context) => {
         block.results.length > 0
           ? block.results[block.results.length - 1].id
           : page.id;
-      // save page id and block id to database
+      // ? save page id and block id to database
       await createGradeTableBlock(lastBlockId, courses);
+      await createUpcomingAssignmentsTodo(lastBlockId);
     })
     .catch((err) => {
-      // Eventually store this error in a log file
+      // * Eventually store this error in a log file
       console.log(err);
       ctx.status = 500;
     })

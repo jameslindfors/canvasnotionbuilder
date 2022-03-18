@@ -1,6 +1,8 @@
 import axios from "axios";
 import { env } from "../../utils/env";
 
+// TODO : Modify query to include if a submission has been made
+// *! Not all assignments have due dates so need another way to check if valid upcomming assignment
 const getCourseAssignmentsQuery = `
 query getCourseAssignments($courseId: ID!) {
         course(id: $courseId) {

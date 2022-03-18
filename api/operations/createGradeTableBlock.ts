@@ -143,18 +143,17 @@ export const createGradeTableBlock = async (
 };
 
 // Util functions
-
 const gradeTextColor = (courseGrade: any) => {
   if (courseGrade.grades != null && courseGrade.grades.currentGrade != null) {
     switch (courseGrade.grades.currentGrade) {
       case "A":
         return "green";
       case "B":
-        return "green";
+        return "yellow";
       case "C":
         return "yellow";
       case "D":
-        return "red";
+        return "orange";
       case "F":
         return "red";
       default:
